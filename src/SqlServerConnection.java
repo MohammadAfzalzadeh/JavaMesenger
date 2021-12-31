@@ -1,10 +1,11 @@
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.SQLException;
-import java.sql.Statement;
+import Models.*;
+import com.sun.xml.internal.ws.api.addressing.WSEndpointReference;
+
+import java.sql.*;
 
 public class SqlServerConnection {
     private Connection connection;
+    private Statement statement;
 
     public SqlServerConnection()  {
 
@@ -12,16 +13,44 @@ public class SqlServerConnection {
 
         String user = "msg";
         String pass = "asd";
-        String insertQuery = "INSERT INTO [dbo].[People]([FullName],[UserName],[Pass],[Email])" +
-                "VALUES('1محمد جدید','MoHoko1','alialiali123','moho@123.com')";
 
         try{
             connection = DriverManager.getConnection(url , user , pass);
-            Statement statement = connection.createStatement();
-            statement.executeQuery(insertQuery);
+            statement = connection.createStatement();
+            /*statement.executeQuery(insertQuery);*/
         } catch (SQLException throwables) {
             throwables.printStackTrace();
         }
+    }
+
+    public void SignInPerson(Person person){
+        String insertQuery = "INSERT INTO [dbo].[People]([FullName],[UserName],[Pass],[Email])" +
+                "VALUES('"+person.getFullName()+"','"+person.getUserName()+"','"+person.getPass()+"','"+person.getEmail()+"')";
+        runQuery(insertQuery);
+    }
+
+    public boolean LogInPerson(Person person){
+        String countQry = "SELECT COUNT(*) FROM [Db_Messenger].[dbo].[People]" +
+                "  WHERE UserName = '"+person.getUserName()+"' and Pass = '"+person.getPass()+"'";
+        try {
+            ResultSet rsSet = runQuery(countQry);
+            rsSet.next();
+            int ctn = (int) rsSet.getObject(1);
+            if (ctn == 1)
+                return true;
+        } catch (SQLException throwables) {
+            throwables.printStackTrace();
+        }
+        return false;
+    }
+
+    private ResultSet runQuery(String qry){
+        try {
+            return statement.executeQuery(qry);
+        } catch (SQLException throwables) {
+            throwables.printStackTrace();
+        }
+        return null;
     }
 
 }
