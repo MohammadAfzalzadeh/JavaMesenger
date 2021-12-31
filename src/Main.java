@@ -6,11 +6,15 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
+import Models.*;
+
 public class Main extends Application {
+
+    private SqlServerConnection sql;
 
     @Override
     public void start(Stage primaryStage) {
-        SqlServerConnection sql = new SqlServerConnection();
+        sql = new SqlServerConnection();
         setLogInPage(primaryStage);
         primaryStage.show();
     }
@@ -19,7 +23,7 @@ public class Main extends Application {
         launch(args);
     }
 
-    private static void setLogInPage(Stage stage) {
+    private void setLogInPage(Stage stage) {
         VBox root = new VBox(20);
         root.setAlignment(Pos.CENTER);
         HBox userName = new HBox(10);
@@ -36,6 +40,11 @@ public class Main extends Application {
         root.getChildren().add(pass);
         Button logIn = new Button("ورود");
         logIn.setOnMouseClicked(event -> {
+            Person prs = new Person(userNameTextField.getText() , passField.getText());
+            if (sql.LogInPerson(prs))
+                showAlert("ورود به سامانه" , "" , "می توانید وارد شوید" , false);
+            else
+                showAlert("ورود به سامانه" , "" , "نمی توانید وارد شوید" , true);
 
         });
         root.getChildren().add(logIn);
@@ -46,7 +55,7 @@ public class Main extends Application {
         stage.setScene(firstPage);
     }
 
-    private static void setSignInPage(Stage stage) {
+    private void setSignInPage(Stage stage) {
         VBox root = new VBox(20);
         root.setAlignment(Pos.CENTER);
         HBox name = new HBox(10);
@@ -76,6 +85,12 @@ public class Main extends Application {
         Button submitSI = new Button(" ثبت نام كردن");
         root.getChildren().add(submitSI);
         submitSI.setOnMouseClicked(event -> {
+            Person nPrs = new Person(nameTextField.getText() , userNameTextField.getText()
+                    , passField.getText() , emailField.getText());
+
+            sql.SignInPerson(nPrs);
+
+            setLogInPage(stage);
 
         });
         Button firstPage = new Button("بازگشت به صفحه ورود");
