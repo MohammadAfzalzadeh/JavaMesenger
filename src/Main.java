@@ -8,6 +8,8 @@ import javafx.stage.Stage;
 
 import Models.*;
 
+import java.util.ArrayList;
+
 public class Main extends Application {
 
     private SqlServerConnection sql;
@@ -43,7 +45,7 @@ public class Main extends Application {
             Person prs = new Person(userNameTextField.getText() , passField.getText());
             if (sql.LogInPerson(prs)){
                 showAlert("ورود به سامانه" , "" , "می توانید وارد شوید" , false);
-                setMainPage(stage);
+                setMainPage(stage , prs);
             }
             else
                 showAlert("ورود به سامانه" , "" , "نمی توانید وارد شوید" , true);
@@ -104,7 +106,7 @@ public class Main extends Application {
         stage.setTitle("صفحه ثبت نام");
     }
 
-    private void setMainPage(Stage stage){
+    private void setMainPage(Stage stage , Person person){
         HBox root = new HBox(20);
         root.setAlignment(Pos.CENTER);
         VBox right = new VBox(20);
@@ -114,6 +116,17 @@ public class Main extends Application {
 
         });*/
         ScrollPane Groups = new ScrollPane();
+        VBox myGrps = new VBox(10);
+        // get all Group To Scroll Pane
+        ArrayList<Groups> grps = sql.GetAllGroupOfOnePerson(person);
+        for (Groups g: grps) {
+            Button grpBtn = new Button(g.getName());
+            grpBtn.setOnAction(event -> {
+                System.out.println(g.getName());
+            });
+            myGrps.getChildren().add(grpBtn);
+        }
+        Groups.setContent(myGrps);
         Button addGrp = new Button("افزودن گروه");
         addGrp.setOnAction(event -> {
 
@@ -125,14 +138,14 @@ public class Main extends Application {
         left.setAlignment(Pos.CENTER);
         ScrollPane messages = new ScrollPane();
 
-        Label txt = new Label();
+        /*Label txt = new Label();
         txt.setAlignment(Pos.CENTER);
         txt.setText( " سلام حسین چطوری ؟");
         for (int i = 0; i < 100; i++) {
             txt.setText(txt.getText() + "\n\n سلام حسین چطوری ؟");
         }
 
-        messages.setContent(txt);
+        messages.setContent(txt);*/
 
 
         HBox msg = new HBox(1);
