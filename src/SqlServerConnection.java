@@ -35,11 +35,14 @@ public class SqlServerConnection {
             ResultSet rsSet = runQuery(countQry);
             rsSet.next();
             int ctn = (int) rsSet.getObject(1);
-            if (ctn == 1)
+            if (ctn == 1) {
+                SetIdOfOnePerson(person);
                 return true;
+            }
         } catch (SQLException throwables) {
             throwables.printStackTrace();
         }
+        person.setPrsId(-1);
         return false;
     }
 
@@ -65,6 +68,19 @@ public class SqlServerConnection {
             throwables.printStackTrace();
         }
         return grps;
+    }
+
+    private void SetIdOfOnePerson(Person person){
+        String selectTopQry = "SELECT TOP 1 [PersonId] FROM [Db_Messenger].[dbo].[People]" +
+                "  WHERE UserName = '"+person.getUserName()+"' and Pass = '"+person.getPass()+"'";
+        try {
+            ResultSet rsSet = runQuery(selectTopQry);
+            rsSet.next();
+            person.setPrsId( (int) rsSet.getObject(1) );
+
+        } catch (SQLException throwables) {
+            throwables.printStackTrace();
+        }
     }
 
     private ResultSet runQuery(String qry){
