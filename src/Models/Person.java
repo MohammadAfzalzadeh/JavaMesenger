@@ -1,6 +1,7 @@
 package Models;
 
 public class Person {
+    private int prsId;
     private String fullName;
     private String userName;
     private String Pass;
@@ -15,6 +16,7 @@ public class Person {
         this.userName = userName;
         Pass = pass;
         Email = email;
+        this.prsId = -1;
     }
 
     public String getFullName() {
@@ -31,5 +33,13 @@ public class Person {
 
     public String getEmail() {
         return Email;
+    }
+
+    public void setPrsId(int prsId) {
+        this.prsId = prsId;
+    }
+
+    public int getPrsId() {
+        return prsId;
     }
 }
