@@ -1,11 +1,13 @@
 package Models;
 
 public class Groups {
+    private long gId;
     private String name;
     private String detail;
 
-    public Groups(String name, String detail) {
+    public Groups(long groupId , String name, String detail) {
         this.name = name;
+        gId = groupId;
         if (detail == "")
             this.detail = null;
         else
