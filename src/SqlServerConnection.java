@@ -1,5 +1,6 @@
 import Models.*;
 import java.sql.*;
+import java.util.ArrayList;
 
 public class SqlServerConnection {
     private Connection connection;
@@ -40,6 +41,30 @@ public class SqlServerConnection {
             throwables.printStackTrace();
         }
         return false;
+    }
+
+    public ArrayList<Groups> GetAllGroupOfOnePerson(Person person){
+        ArrayList<Groups> grps = new ArrayList<>();
+
+        String qry = "SELECT GrpId , GrpName , GrpDetail "+
+                " FROM Db_Messenger.dbo.PersonToGrp_Tb AS PrsGrp" +
+                " INNER JOIN Db_Messenger.dbo.Groups AS Grp "+
+                " ON (Grp.GrpId = PrsGrp.GrpIdToPer)" +
+                " WHERE (PrsGrp.PerIdToGrp = "+ person.getPrsId() +" )";
+
+        try {
+            ResultSet groupsResSet = runQuery(qry);
+            while (groupsResSet.next())
+                grps.add(
+                new Groups( (long) groupsResSet.getObject(1) ,
+                        (String) groupsResSet.getObject(2) ,
+                        (String) groupsResSet.getObject(3) )
+                );
+
+        }catch (SQLException throwables){
+            throwables.printStackTrace();
+        }
+        return grps;
     }
 
     private ResultSet runQuery(String qry){
