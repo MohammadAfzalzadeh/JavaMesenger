@@ -9,6 +9,7 @@ import javafx.stage.Stage;
 import Models.*;
 
 import java.util.ArrayList;
+import java.util.Locale;
 
 public class Main extends Application {
 
@@ -57,7 +58,7 @@ public class Main extends Application {
         signIn.setOnMouseClicked(event -> { setSignInPage(stage); });
         Scene firstPage = new Scene(root);
         stage.setScene(firstPage);
-        stage.setTitle("صفحه ورورد");
+        stage.setTitle("صفحه ورود");
     }
 
     private void setSignInPage(Stage stage) {
@@ -129,7 +130,7 @@ public class Main extends Application {
         Groups.setContent(myGrps);
         Button addGrp = new Button("افزودن گروه");
         addGrp.setOnAction(event -> {
-
+            setAddToGrpPage(stage , person);
         });
         right.getChildren().addAll(/*showPrs ,*/ Groups , addGrp);
 
@@ -165,6 +166,27 @@ public class Main extends Application {
         stage.setScene(mainPage);
         stage.setTitle("صفحه اصلی");
 
+    }
+
+    private void setAddToGrpPage(Stage stage , Person p){
+        VBox root = new VBox(20);
+        root.setAlignment(Pos.CENTER);
+        TextField txt = new TextField();
+        Button btn = new Button("Submit");
+        btn.setOnAction(event -> {
+            if (sql.JoinExGrp(txt.getText(), p))
+                showAlert("افزودن به گروه جدید"  , "موفق" , "شما به گروه اضافه شدید" , false);
+            else
+                showAlert("افزودن به گروه جدید"  , "نا موفق" ,
+                        "به دلایل زیر شما به گروه اضافه نشدید"+
+                                "\n1)  گروهی با این نام وجود ندارد " +
+                                "\n2) شما قبلا عضو هستید" , true);
+            setMainPage(stage , p);
+        });
+        root.getChildren().addAll(txt , btn);
+        Scene mainPage = new Scene(root);
+        stage.setScene(mainPage);
+        stage.setTitle("عضویت در گروه");
     }
 
     private static void showAlert(String title , String headerText ,String mainText , boolean isError) {
