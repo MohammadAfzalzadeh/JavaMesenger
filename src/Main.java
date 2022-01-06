@@ -9,7 +9,6 @@ import javafx.stage.Stage;
 import Models.*;
 
 import java.util.ArrayList;
-import java.util.Locale;
 
 public class Main extends Application {
 
@@ -132,7 +131,12 @@ public class Main extends Application {
         addGrp.setOnAction(event -> {
             setAddToGrpPage(stage , person);
         });
-        right.getChildren().addAll(/*showPrs ,*/ Groups , addGrp);
+
+        Button newGrp = new Button("ساخت گروه جدید");
+        newGrp.setOnAction(event -> {
+            setMakeGrp(stage , person);
+        });
+        right.getChildren().addAll(/*showPrs ,*/ Groups , addGrp , newGrp);
 
 
         VBox left = new VBox(20);
@@ -181,6 +185,26 @@ public class Main extends Application {
                         "به دلایل زیر شما به گروه اضافه نشدید"+
                                 "\n1)  گروهی با این نام وجود ندارد " +
                                 "\n2) شما قبلا عضو هستید" , true);
+            setMainPage(stage , p);
+        });
+        root.getChildren().addAll(txt , btn);
+        Scene mainPage = new Scene(root);
+        stage.setScene(mainPage);
+        stage.setTitle("عضویت در گروه");
+    }
+
+    private void setMakeGrp(Stage stage , Person p){
+        VBox root = new VBox(20);
+        root.setAlignment(Pos.CENTER);
+        TextField txt = new TextField();
+        Button btn = new Button("Submit");
+        btn.setOnAction(event -> {
+            if (sql.addNewGrp(txt.getText(), p))
+                showAlert("ساخت گروه جدید"  , "موفق" , "شما به گروه اضافه شدید" , false);
+            else
+                showAlert("ساخت گروه جدید"  , "نا موفق" ,
+                        "به دلیل زیر گروه ساخته نشد"+
+                                "\n گروه از قبل وجود دارد" , true);
             setMainPage(stage , p);
         });
         root.getChildren().addAll(txt , btn);

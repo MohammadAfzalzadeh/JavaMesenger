@@ -71,25 +71,40 @@ public class SqlServerConnection {
     }
 
     public boolean JoinExGrp(String grpName , Person person){
+        if (IsExGrp(grpName) && IsPersonInGrp(grpName, person) ) {
+            String qry ="use Db_Messenger "+
+                        "INSERT INTO PersonToGrp_Tb" +
+                        " SELECT  GrpId , "+person.getPrsId()+", GETDATE ()" +
+                        " FROM Groups WHERE GrpName = '"+ grpName +"'";
+            runQuery(qry);
+            return true;
+        }
+        return false;
+    }
+
+    public boolean addNewGrp(String grpName , Person person){
+        if (!IsExGrp(grpName)) {
+            String qry = "INSERT INTO [Db_Messenger].[dbo].[Groups] " +
+                    " ([GrpName],[GrpOwnerId]) VALUES ('"+grpName+"',"+person.getPrsId()+")";
+            runQuery(qry);
+            JoinExGrp(grpName , person);
+            return true;
+        }
+        return false;
+    }
+
+    private boolean IsExGrp(String grpName){
         String countQry = "SELECT COUNT (*) FROM Db_Messenger.dbo.Groups" +
                 " WHERE GrpName = '"+ grpName +"'";
         try {
             ResultSet rsSet = runQuery(countQry);
             rsSet.next();
             int ctn = (int) rsSet.getObject(1);
-            if (ctn == 1 && IsPersonInGrp(grpName, person) ) {
-                String qry ="use Db_Messenger "+
-                        "INSERT INTO PersonToGrp_Tb" +
-                        " SELECT  GrpId , "+person.getPrsId()+", GETDATE ()" +
-                        " FROM Groups WHERE GrpName = '"+ grpName +"'";
-                runQuery(qry);
-                return true;
-            }
-        } catch (SQLException throwables) {
+            if (ctn == 1) return true;
+        }catch (SQLException throwables){
             throwables.printStackTrace();
         }
         return false;
-
     }
 
     private boolean IsPersonInGrp (String grpName , Person person){
