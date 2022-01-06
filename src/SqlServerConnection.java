@@ -70,6 +70,33 @@ public class SqlServerConnection {
         return grps;
     }
 
+    public boolean JoinExGrp(String GrpName , Person person){
+        String countQry = "SELECT COUNT (*) FROM Db_Messenger.dbo.Groups" +
+                " WHERE GrpName = '"+ GrpName +"'";
+        try {
+            ResultSet rsSet = runQuery(countQry);
+            rsSet.next();
+            int ctn = (int) rsSet.getObject(1);
+            if (ctn == 1) {
+                String qry ="use Db_Messenger "+
+                        "INSERT INTO PersonToGrp_Tb" +
+                        " SELECT "+person.getPrsId()+", GrpId, GETDATE ()" +
+                        " FROM Groups WHERE GrpName = '"+ GrpName +"'";
+                runQuery(qry);
+                return true;
+            }
+        } catch (SQLException throwables) {
+            if (throwables.getMessage() == "The statement did not return a result set.");
+            else{
+
+            throwables.printStackTrace();
+            }
+
+        }
+        return false;
+
+    }
+
     private void SetIdOfOnePerson(Person person){
         String selectTopQry = "SELECT TOP 1 [PersonId] FROM [Db_Messenger].[dbo].[People]" +
                 "  WHERE UserName = '"+person.getUserName()+"' and Pass = '"+person.getPass()+"'";
@@ -87,7 +114,10 @@ public class SqlServerConnection {
         try {
             return statement.executeQuery(qry);
         } catch (SQLException throwables) {
+            if (throwables.getMessage() == "The statement did not return a result set.");
+            else
             throwables.printStackTrace();
+
         }
         return null;
     }
