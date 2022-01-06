@@ -70,31 +70,41 @@ public class SqlServerConnection {
         return grps;
     }
 
-    public boolean JoinExGrp(String GrpName , Person person){
+    public boolean JoinExGrp(String grpName , Person person){
         String countQry = "SELECT COUNT (*) FROM Db_Messenger.dbo.Groups" +
-                " WHERE GrpName = '"+ GrpName +"'";
+                " WHERE GrpName = '"+ grpName +"'";
         try {
             ResultSet rsSet = runQuery(countQry);
             rsSet.next();
             int ctn = (int) rsSet.getObject(1);
-            if (ctn == 1) {
+            if (ctn == 1 && IsPersonInGrp(grpName, person) ) {
                 String qry ="use Db_Messenger "+
                         "INSERT INTO PersonToGrp_Tb" +
-                        " SELECT "+person.getPrsId()+", GrpId, GETDATE ()" +
-                        " FROM Groups WHERE GrpName = '"+ GrpName +"'";
+                        " SELECT  GrpId , "+person.getPrsId()+", GETDATE ()" +
+                        " FROM Groups WHERE GrpName = '"+ grpName +"'";
                 runQuery(qry);
                 return true;
             }
         } catch (SQLException throwables) {
-            if (throwables.getMessage() == "The statement did not return a result set.");
-            else{
-
             throwables.printStackTrace();
-            }
-
         }
         return false;
 
+    }
+
+    private boolean IsPersonInGrp (String grpName , Person person){
+        String cntQry = "SELECT COUNT(*)  FROM Db_Messenger.dbo.PersonToGrp_Tb As link" +
+                " INNER JOIN Db_Messenger.dbo.Groups As grp on grp.GrpId = link.GrpIdToPer" +
+                " WHERE grp.GrpName = '"+grpName+"' and link.PerIdToGrp = " + person.getPrsId();
+        try {
+            ResultSet rsSet = runQuery(cntQry);
+            rsSet.next();
+            int ctn = (int) rsSet.getObject(1);
+            if (ctn == 0)  return true;
+        } catch (SQLException throwables) {
+            throwables.printStackTrace();
+        }
+        return false;
     }
 
     private void SetIdOfOnePerson(Person person){
