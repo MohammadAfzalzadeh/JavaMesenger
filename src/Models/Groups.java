@@ -23,4 +23,8 @@ public class Groups {
             return "";
         return detail;
     }
+
+    public long getGrpId() {
+        return gId;
+    }
 }
