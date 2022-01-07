@@ -93,6 +93,13 @@ public class SqlServerConnection {
         return false;
     }
 
+    public void SendMessage(String msg , Groups g , Person p){
+        String qry = "INSERT INTO  [Db_Messenger].[dbo].[Messages] " +
+                "([MsgTxt],[MsgDate],[MsgOwnerPersonId],[MsgOwnerGrpId]) " +
+                "VALUES ('" + msg + "' , GETDATE() , "+ p.getPrsId() +" , "+ g.getGrpId() +")";
+        runQuery(qry);
+    }
+
     private boolean IsExGrp(String grpName){
         String countQry = "SELECT COUNT (*) FROM Db_Messenger.dbo.Groups" +
                 " WHERE GrpName = '"+ grpName +"'";

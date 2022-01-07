@@ -9,14 +9,18 @@ import javafx.stage.Stage;
 import Models.*;
 
 import java.util.ArrayList;
+import java.util.concurrent.atomic.AtomicReference;
 
 public class Main extends Application {
 
     private SqlServerConnection sql;
+    private AtomicReference<Groups> defGrp;
 
     @Override
     public void start(Stage primaryStage) {
         sql = new SqlServerConnection();
+        defGrp = new AtomicReference<>();
+        defGrp.set(new Groups(-1 , "alaki" , null));
         setLogInPage(primaryStage);
         primaryStage.show();
     }
@@ -121,8 +125,13 @@ public class Main extends Application {
         ArrayList<Groups> grps = sql.GetAllGroupOfOnePerson(person);
         for (Groups g: grps) {
             Button grpBtn = new Button(g.getName());
+            if (g.getGrpId() == defGrp.get().getGrpId())
+                grpBtn.setStyle("-fx-background-color: #00ff00");
+            else
+                grpBtn.setStyle("-fx-background-color: #000000");
             grpBtn.setOnAction(event -> {
-                System.out.println(g.getName());
+                defGrp.set(new Groups(g.getGrpId(), g.getName(), g.getDetail()));
+                setMainPage(stage , person);
             });
             myGrps.getChildren().add(grpBtn);
         }
@@ -158,7 +167,13 @@ public class Main extends Application {
         TextField txtMsg = new TextField();
         Button send = new Button("s");
         send.setOnAction(event -> {
-
+            if (defGrp.get().getGrpId() == -1)
+                showAlert("ارسال پیام ناموفق" , "گروهی انتخاب نشده است" ,
+                        "لطفا برای ارسال پیام یک گروه را انتخاب کند" + "\n" +
+                                "گروهی که انتاب کنید سبز می شود" ,true);
+            else
+            if (txtMsg.getText() != "" && txtMsg.getText() != null)
+                sql.SendMessage(txtMsg.getText() , defGrp.get() , person);
         });
         msg.getChildren().addAll(send , txtMsg);
         left.getChildren().addAll(messages , msg );
@@ -200,7 +215,8 @@ public class Main extends Application {
         Button btn = new Button("Submit");
         btn.setOnAction(event -> {
             if (sql.addNewGrp(txt.getText(), p))
-                showAlert("ساخت گروه جدید"  , "موفق" , "شما به گروه اضافه شدید" , false);
+                showAlert("ساخت گروه جدید"  , "موفق" ,
+                        "گروه جدید با موفقیت ساخته شد" , false);
             else
                 showAlert("ساخت گروه جدید"  , "نا موفق" ,
                         "به دلیل زیر گروه ساخته نشد"+
