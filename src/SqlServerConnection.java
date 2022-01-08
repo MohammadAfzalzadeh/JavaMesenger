@@ -49,7 +49,7 @@ public class SqlServerConnection {
     public ArrayList<Groups> GetAllGroupOfOnePerson(Person person){
         ArrayList<Groups> grps = new ArrayList<>();
 
-        String qry = "SELECT GrpId , GrpName , GrpDetail "+
+        String qry = "SELECT GrpId , GrpName , GrpDetail , KeyOfGrp "+
                 " FROM Db_Messenger.dbo.PersonToGrp_Tb AS PrsGrp" +
                 " INNER JOIN Db_Messenger.dbo.Groups AS Grp "+
                 " ON (Grp.GrpId = PrsGrp.GrpIdToPer)" +
@@ -61,7 +61,8 @@ public class SqlServerConnection {
                 grps.add(
                 new Groups( (long) groupsResSet.getObject(1) ,
                         (String) groupsResSet.getObject(2) ,
-                        (String) groupsResSet.getObject(3) )
+                        (String) groupsResSet.getObject(3),
+                        (String) groupsResSet.getObject(4) )
                 );
 
         }catch (SQLException throwables){
@@ -85,7 +86,8 @@ public class SqlServerConnection {
     public boolean addNewGrp(String grpName , Person person){
         if (!IsExGrp(grpName)) {
             String qry = "INSERT INTO [Db_Messenger].[dbo].[Groups] " +
-                    " ([GrpName],[GrpOwnerId]) VALUES ('"+grpName+"',"+person.getPrsId()+")";
+                    " ([GrpName],[GrpOwnerId],[KeyOfGrp]) "+
+                    " VALUES ('"+grpName+"',"+person.getPrsId()+" , '"+Groups.getRandomString(10)+"')";
             runQuery(qry);
             JoinExGrp(grpName , person);
             return true;
@@ -139,6 +141,7 @@ public class SqlServerConnection {
         return false;
     }
 
+    //return val should correct
     private boolean IsPersonInGrp (String grpName , Person person){
         String cntQry = "SELECT COUNT(*)  FROM Db_Messenger.dbo.PersonToGrp_Tb As link" +
                 " INNER JOIN Db_Messenger.dbo.Groups As grp on grp.GrpId = link.GrpIdToPer" +
