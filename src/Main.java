@@ -126,11 +126,11 @@ public class Main extends Application {
         for (Groups g: grps) {
             Button grpBtn = new Button(g.getName());
             if (g.getGrpId() == defGrp.get().getGrpId())
-                grpBtn.setStyle("-fx-background-color: #00ff00");
+                grpBtn.setStyle("-fx-background-color: #b22222");
             else
-                grpBtn.setStyle("-fx-background-color: #000000");
+                grpBtn.setStyle("-fx-background-color: #1e90ff");
             grpBtn.setOnAction(event -> {
-                defGrp.set(new Groups(g.getGrpId(), g.getName(), g.getDetail()));
+                defGrp.set(g);
                 setMainPage(stage , person);
             });
             myGrps.getChildren().add(grpBtn);

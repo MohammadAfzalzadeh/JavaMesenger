@@ -96,9 +96,10 @@ public class SqlServerConnection {
     }
 
     public void SendMessage(String msg , Groups g , Person p){
+        String msgEncrypt = AES.encrypt(msg , g.getKey());
         String qry = "INSERT INTO  [Db_Messenger].[dbo].[Messages] " +
                 "([MsgTxt],[MsgDate],[MsgOwnerPersonId],[MsgOwnerGrpId]) " +
-                "VALUES ('" + msg + "' , GETDATE() , "+ p.getPrsId() +" , "+ g.getGrpId() +")";
+                "VALUES ('" + msgEncrypt + "' , GETDATE() , "+ p.getPrsId() +" , "+ g.getGrpId() +")";
         runQuery(qry);
     }
 
@@ -115,7 +116,7 @@ public class SqlServerConnection {
             ResultSet MsgsResSet = runQuery(qry);
             while (MsgsResSet.next())
                 Msgs.add( new Message(
-                        (String) MsgsResSet.getObject(1) , //txt
+                        AES.decrypt((String) MsgsResSet.getObject(1) , group.getKey()) , //txt
                         (java.sql.Timestamp) MsgsResSet.getObject(2) , //date
                         (String) MsgsResSet.getObject(3)  //fullname
                 ));
