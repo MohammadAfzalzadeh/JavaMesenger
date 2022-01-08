@@ -152,14 +152,19 @@ public class Main extends Application {
         left.setAlignment(Pos.CENTER);
         ScrollPane messages = new ScrollPane();
 
-        /*Label txt = new Label();
-        txt.setAlignment(Pos.CENTER);
-        txt.setText( " سلام حسین چطوری ؟");
-        for (int i = 0; i < 100; i++) {
-            txt.setText(txt.getText() + "\n\n سلام حسین چطوری ؟");
+        Label txtMsgs = new Label();
+        txtMsgs.setAlignment(Pos.CENTER);
+        String lblMsg = "";
+        if (defGrp.get().getGrpId() == -1)
+            lblMsg = "برای نمایش پیام لطفا یک گروه را انتخاب کنید";
+        else{
+            ArrayList<Message> msgOfOneGrp= sql.GetAllMsgOfOneGrp(defGrp.get());
+            for (Message msg : msgOfOneGrp) {
+                lblMsg += "\n"+msg.toString();
+            }
         }
-
-        messages.setContent(txt);*/
+        txtMsgs.setText(lblMsg);
+        messages.setContent(txtMsgs);
 
 
         HBox msg = new HBox(1);
@@ -174,6 +179,8 @@ public class Main extends Application {
             else
             if (txtMsg.getText() != "" && txtMsg.getText() != null)
                 sql.SendMessage(txtMsg.getText() , defGrp.get() , person);
+
+            setMainPage(stage , person);
         });
         msg.getChildren().addAll(send , txtMsg);
         left.getChildren().addAll(messages , msg );

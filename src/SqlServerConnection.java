@@ -100,6 +100,31 @@ public class SqlServerConnection {
         runQuery(qry);
     }
 
+    public ArrayList<Message> GetAllMsgOfOneGrp(Groups group){
+        ArrayList <Message> Msgs = new ArrayList<Message>();
+
+        String qry = "SELECT MsgTxt , MsgDate , FullName " +
+                " FROM [Db_Messenger].[dbo].[Messages] AS Msg " +
+                " INNER JOIN [Db_Messenger].[dbo].People AS Prn " +
+                " ON Msg.MsgOwnerPersonId = Prn.PersonId " +
+                " WHERE Msg.MsgOwnerGrpId = " + group.getGrpId();
+
+        try {
+            ResultSet MsgsResSet = runQuery(qry);
+            while (MsgsResSet.next())
+                Msgs.add( new Message(
+                        (String) MsgsResSet.getObject(1) , //txt
+                        (java.sql.Timestamp) MsgsResSet.getObject(2) , //date
+                        (String) MsgsResSet.getObject(3)  //fullname
+                ));
+
+        }catch (SQLException throwables){
+            throwables.printStackTrace();
+        }
+
+        return Msgs;
+    }
+
     private boolean IsExGrp(String grpName){
         String countQry = "SELECT COUNT (*) FROM Db_Messenger.dbo.Groups" +
                 " WHERE GrpName = '"+ grpName +"'";
